@@ -5,11 +5,10 @@ using UnityEngine;
 public abstract class NPC_Controller : MonoBehaviour
 {
 	protected CharacterController characterController;
-	
+
 	public float movementSpeed = 0.1f;
 	public float turningTime = 1f;
 	protected float turnSmoothVelocity;
-
 	protected float epsilon = 0.5f;
 
 	protected void InitSuper()
@@ -32,5 +31,30 @@ public abstract class NPC_Controller : MonoBehaviour
 		float targetAngle = Mathf.Atan2(lookAt.x, lookAt.z) * Mathf.Rad2Deg;
 		float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turningTime);
 		transform.rotation = Quaternion.Euler(0f, angle, 0f);
+	}
+
+
+	//Checks if there is a wall between the NPC and the position and if they are not to far appart.
+	//layerMask is the Mask, with all the walls the NPC cant see through
+	protected bool CanSeePosition(Vector3 pos, float sightDistance, LayerMask layerMask)
+	{
+		//Check if the distance is to far
+		float distanceToPos = Distance(transform.position, pos);
+		if(distanceToPos > sightDistance)
+		{
+			return false;
+		}
+
+		//Check if there is a wall inbetween
+		if (Physics.Linecast(pos, transform.position, layerMask))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	protected float Distance(Vector3 v1, Vector3 v2)
+	{
+		return (v1 - v2).magnitude;
 	}
 }
