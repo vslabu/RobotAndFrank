@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FrankController : NPC_Controller
 {
@@ -18,8 +15,9 @@ public class FrankController : NPC_Controller
 	// Start is called before the first frame update
 	void Start()
     {
-		GameEvents.current.onShortBeep += OnShortStart;
-		GameEvents.current.onLongBeep += OnLongStart;
+		InitSuper();
+		GameEvents.current.onShortBeep += OnShortBeep;
+		GameEvents.current.onLongBeep += OnLongBeep;
 	}
 
 
@@ -28,27 +26,31 @@ public class FrankController : NPC_Controller
 		switch (currentBehavior)
 		{
 			case Behavior.Walk:
-				walkBehavior();
+				WalkBehavior();
 				return;
 		}	
 	}
 
-	void walkBehavior()
+	void WalkBehavior()
 	{
-		if(transform.position != currentDestination)
+		Vector3 offset = currentDestination - transform.position;
+		if (offset.magnitude > epsilon)
 		{
-			moveTowards(currentDestination);
+			MoveTowards(currentDestination);
+		} else
+		{
+			currentBehavior = Behavior.Stand;
 		}
 	}
 
-	void OnShortStart(Vector3 beepPos)
+	void OnShortBeep(Vector3 beepPos)
 	{
 		currentBehavior = Behavior.Stand;
 	}
 
-	void OnLongStart(Vector3 beepPos)
+	void OnLongBeep(Vector3 beepPos)
 	{
 		currentBehavior = Behavior.Walk;
-		currentDestination = vectorToPlaneVector(beepPos);
+		currentDestination = beepPos;
 	}
 }
