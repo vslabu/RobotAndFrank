@@ -13,30 +13,39 @@ public class GameEvents : MonoBehaviour
 		current = this;
 	}
 
-	public event Action<Vector3> onBeepStart;
+	public event Action<Vector3> OnBeepStart;
 	public void BeepStart(Vector3 beepPos)
 	{
-		if(onBeepStart != null)
+		if(OnBeepStart != null)
 		{
-			onBeepStart(beepPos);
+			OnBeepStart(beepPos);
 		}
 	}
 
-	public event Action<Vector3> onShortBeep;
+	public event Action<Vector3> OnShortBeep;
 	public void ShortBeep(Vector3 beepPos)
 	{
-		if (onShortBeep != null)
+		if (OnShortBeep != null)
 		{
-			onShortBeep(beepPos);
+			OnShortBeep(beepPos);
 		}
 	}
 
-	public event Action<Vector3> onLongBeep;
+	public event Action<Vector3> OnLongBeep;
 	public void LongBeep(Vector3 beepPos)
 	{
-		if (onLongBeep != null)
+		if (OnLongBeep != null)
 		{
-			onLongBeep(beepPos);
+			OnLongBeep(beepPos);
+		}
+	}
+
+	public event Action<Vector3> OnFrankCaught;
+	public void FrankCaught(Vector3 beepPos)
+	{
+		if (OnFrankCaught != null)
+		{
+			OnFrankCaught(beepPos);
 		}
 	}
 }

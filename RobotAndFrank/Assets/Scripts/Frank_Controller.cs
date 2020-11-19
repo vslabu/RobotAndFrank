@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class FrankController : NPC_Controller
+public class Frank_Controller : NPC_Controller
 {
 	enum Behavior
 	{
@@ -20,8 +20,8 @@ public class FrankController : NPC_Controller
 	void Start()
     {
 		InitSuper();
-		GameEvents.current.onShortBeep += OnShortBeep;
-		GameEvents.current.onLongBeep += OnLongBeep;
+		GameEvents.current.OnShortBeep += OnShortBeep;
+		GameEvents.current.OnLongBeep += OnLongBeep;
 	}
 
 
