@@ -11,7 +11,7 @@ public abstract class NPC_Controller : MonoBehaviour
 	protected float turnSmoothVelocity;
 	protected float epsilon = 0.5f;
 
-	protected void InitSuper()
+	protected void InitNPCMovement()
 	{
 		characterController = GetComponent<CharacterController>();
 	}
@@ -39,7 +39,7 @@ public abstract class NPC_Controller : MonoBehaviour
 	protected bool CanSeePosition(Vector3 pos, float sightDistance, LayerMask layerMask)
 	{
 		//Check if the distance is to far
-		float distanceToPos = Distance(transform.position, pos);
+		float distanceToPos = Vector3.Distance(transform.position, pos);
 		if(distanceToPos > sightDistance)
 		{
 			return false;
@@ -51,10 +51,5 @@ public abstract class NPC_Controller : MonoBehaviour
 			return false;
 		}
 		return true;
-	}
-
-	protected float Distance(Vector3 v1, Vector3 v2)
-	{
-		return (v1 - v2).magnitude;
 	}
 }

@@ -5,21 +5,22 @@ public class Frank_Controller : NPC_Controller
 	enum Behavior
 	{
 		Stand,
-		Walk
+		Walk,
+		Detected
 	};
 
 	Behavior currentBehavior = Behavior.Stand;
 	Vector3 currentDestination;
 
 	[Header("Hearing Variables")]
-	public float hearingDistance = 20f;
-	public LayerMask hearingMask;
+	public float hearingRadius = 20f;
+	public LayerMask obstacleMask;
 
 
 	// Start is called before the first frame update
 	void Start()
     {
-		InitSuper();
+		InitNPCMovement();
 		GameEvents.current.OnShortBeep += OnShortBeep;
 		GameEvents.current.OnLongBeep += OnLongBeep;
 	}
@@ -35,10 +36,12 @@ public class Frank_Controller : NPC_Controller
 		}	
 	}
 
+	#region Behaviors
+
 	void WalkBehavior()
 	{
 		//Check if Frank reached the destination
-		float distanceToCurrentDestination = Distance(currentDestination, transform.position);
+		float distanceToCurrentDestination = Vector3.Distance(currentDestination, transform.position);
 		if (distanceToCurrentDestination > epsilon)
 		{
 			//Did not yet reach it
@@ -50,8 +53,12 @@ public class Frank_Controller : NPC_Controller
 		}
 	}
 
+	#endregion
+
+	#region Detecting external events
 	void OnShortBeep(Vector3 beepPos)
 	{
+		//Check if Frank can hear the sound
 		if (CanHearBeep(beepPos))
 		{
 			currentBehavior = Behavior.Stand;
@@ -66,7 +73,11 @@ public class Frank_Controller : NPC_Controller
 			currentBehavior = Behavior.Walk;
 			currentDestination = beepPos;
 		}
-		
+	}
+
+	public void OnDetect()
+	{
+		currentBehavior = Behavior.Detected;
 	}
 
 	private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -78,8 +89,15 @@ public class Frank_Controller : NPC_Controller
 		}
 	}
 
+	#endregion
+
 	private bool CanHearBeep(Vector3 beepPos)
 	{
-		return CanSeePosition(beepPos, hearingDistance, hearingMask);
+		return CanSeePosition(beepPos, hearingRadius, obstacleMask);
+	}
+
+	public bool IsDetected()
+	{
+		return currentBehavior == Behavior.Detected;
 	}
 }
