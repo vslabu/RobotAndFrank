@@ -7,7 +7,8 @@ public class Beep_Controller : MonoBehaviour
 
 	bool buttonDown = false;
 	float timer_down = 0;
-	public float shortPressTime = 0.45f; //Kürzer drücken ist ein kurzer Peep, länger ein langer
+	[SerializeField]
+	readonly float shortPressTime = 0.45f; //Pressing the beep-button shorter than this is a short beep. Otherwise it's a long one
 
 	// Update is called once per frame
 	void Update()

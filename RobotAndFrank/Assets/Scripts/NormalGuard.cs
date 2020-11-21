@@ -16,15 +16,27 @@ public class NormalGuard : EnemySenses
 		BackToBuisness //Guard goes Back to his normal buisness
 	}
 
-	public enum IdleBehavior
+	enum IdleBehavior
 	{
 		Stand,
 		Turn,
 		MoveOnPath
 	}
 
+	[Header("Behavior")]
+	[SerializeField]
+	IdleBehavior idleBehavior = IdleBehavior.Stand;
 	Behavior currentBehavior = Behavior.Idle;
-	public IdleBehavior idleBehavior = IdleBehavior.Stand;
+
+	#region TurnBehavior
+
+	[Range(0,360)]
+	public float turnAngle = 0; //Only used if idleBehavior = Turn
+	bool turnright = true;
+	[HideInInspector]
+	public Vector3 leftTurnBorder, rightTurnBorder;
+
+	#endregion
 
 	#endregion
 
@@ -32,6 +44,10 @@ public class NormalGuard : EnemySenses
 	void Start()
     {
 		InitSenses();
+
+		//Init vectors used in turning behavior
+		leftTurnBorder = transform.forward;
+		rightTurnBorder = DirFromAngle(turnAngle, false);
     }
 
     // Update is called once per frame
@@ -63,10 +79,39 @@ public class NormalGuard : EnemySenses
 			case IdleBehavior.Stand:
 				return;
 			case IdleBehavior.Turn:
+				Turn();
 				return; //TODO: Guard turning
 			case IdleBehavior.MoveOnPath:
 				return; //TODO: Guard moving on path
 		}
+	}
+
+	void Turn()
+	{
+		if (turnright)
+		{
+			//Debug.Log("Rechts");
+			TurnRightTowards(rightTurnBorder);
+			if(IsAlmostEqual(transform.forward, rightTurnBorder))
+			{
+				//Reached right border
+				turnright = false;
+			}
+		} else
+		{
+			//Debug.Log("Links");
+			TurnLeftTowards(leftTurnBorder);
+			if (IsAlmostEqual(transform.forward, leftTurnBorder))
+			{
+				//reached left border
+				turnright = true;
+			}
+		}
+	}
+
+	public bool HasTurnBehavior()
+	{
+		return idleBehavior == IdleBehavior.Turn;
 	}
 
 	void DetectedFrank()

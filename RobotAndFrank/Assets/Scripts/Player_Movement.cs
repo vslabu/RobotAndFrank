@@ -7,8 +7,10 @@ public class Player_Movement : MonoBehaviour
 	CharacterController controller;
 	Vector3 movement_direction;
 
-	public float movementSpeed = 5f;
-	public float turningTime = 1f;
+	[SerializeField]
+	float movementSpeed = 5f;
+	[SerializeField]
+	float turningTime = 1f;
 	float turnSmoothVelocity;
 
 	private void Start()

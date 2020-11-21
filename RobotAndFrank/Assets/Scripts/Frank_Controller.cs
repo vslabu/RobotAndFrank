@@ -13,7 +13,9 @@ public class Frank_Controller : NPC_Controller
 	Vector3 currentDestination;
 
 	[Header("Hearing Variables")]
-	public float hearingRadius = 20f;
+	[SerializeField]
+	float hearingRadius = 20f;
+	[SerializeField]
 	public LayerMask obstacleMask;
 
 

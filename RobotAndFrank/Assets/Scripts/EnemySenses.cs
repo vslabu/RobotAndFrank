@@ -10,7 +10,8 @@ public abstract class EnemySenses : NPC_Controller
 	public float viewRadius = 10f;
 	[Range(0,360)]
 	public float viewAngle;
-	public LayerMask obstacleMask;
+	[SerializeField]
+	protected LayerMask obstacleMask;
 
 
 	protected void InitSenses()
