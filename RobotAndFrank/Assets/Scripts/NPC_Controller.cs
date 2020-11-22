@@ -28,7 +28,7 @@ public abstract class NPC_Controller : MonoBehaviour
 		TurnTowardsSmooth(offset);
 
 		offset = offset.normalized * movementSpeed;
-		characterController.Move(offset * Time.deltaTime);
+		characterController.SimpleMove(offset);
 	}
 
 	protected void TurnTowardsSmooth(Vector3 lookAt)//Turns NPC towards target
@@ -73,6 +73,7 @@ public abstract class NPC_Controller : MonoBehaviour
 		return true;
 	}
 
+	//Returns true, when two vector are almost equal
 	protected bool IsAlmostEqual(Vector3 v1, Vector3 v2)
 	{
 		if(Vector3.Distance(v1,v2) < epsilon)
@@ -80,5 +81,22 @@ public abstract class NPC_Controller : MonoBehaviour
 			return true;
 		}
 		return false;
+	}
+
+	protected bool IsAlmostEqual(Vector3 v1, Vector3 v2, float e)
+	{
+		if (Vector3.Distance(v1, v2) < e)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	//returns true, when two points have almost equal positions on the plane 
+	protected bool IsAbove(Vector3 v1, Vector3 v2)
+	{
+		v1.y = 0;
+		v2.y = 0;
+		return IsAlmostEqual(v1, v2);
 	}
 }

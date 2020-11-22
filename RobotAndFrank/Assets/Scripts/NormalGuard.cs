@@ -28,13 +28,21 @@ public class NormalGuard : EnemySenses
 	IdleBehavior idleBehavior = IdleBehavior.Stand;
 	Behavior currentBehavior = Behavior.Idle;
 
-	#region TurnBehavior
+	#region Turn Behavior
 
 	[Range(0,360)]
 	public float turnAngle = 0; //Only used if idleBehavior = Turn
 	bool turnright = true;
 	[HideInInspector]
 	public Vector3 leftTurnBorder, rightTurnBorder;
+
+	#endregion
+
+	#region WalkOnPath Behavior
+
+	public Transform pathHolder;
+	Vector3[] waypoints;
+	int targetWaypoint = 0;
 
 	#endregion
 
@@ -48,6 +56,16 @@ public class NormalGuard : EnemySenses
 		//Init vectors used in turning behavior
 		leftTurnBorder = transform.forward;
 		rightTurnBorder = DirFromAngle(turnAngle, false);
+
+		//Init path
+		if(pathHolder != null)
+		{
+			waypoints = new Vector3[pathHolder.childCount];
+			for (int i = 0; i < waypoints.Length; i++)
+			{
+				waypoints[i] = pathHolder.GetChild(i).position;
+			}
+		}
     }
 
     // Update is called once per frame
@@ -72,6 +90,8 @@ public class NormalGuard : EnemySenses
 
 	#region Behaviors
 
+	#region Idle Behaviors
+
 	private void Idle()
 	{
 		switch (idleBehavior)
@@ -80,9 +100,10 @@ public class NormalGuard : EnemySenses
 				return;
 			case IdleBehavior.Turn:
 				Turn();
-				return; //TODO: Guard turning
+				return;
 			case IdleBehavior.MoveOnPath:
-				return; //TODO: Guard moving on path
+				MoveOnPath();
+				return;
 		}
 	}
 
@@ -90,7 +111,6 @@ public class NormalGuard : EnemySenses
 	{
 		if (turnright)
 		{
-			//Debug.Log("Rechts");
 			TurnRightTowards(rightTurnBorder);
 			if(IsAlmostEqual(transform.forward, rightTurnBorder))
 			{
@@ -99,7 +119,6 @@ public class NormalGuard : EnemySenses
 			}
 		} else
 		{
-			//Debug.Log("Links");
 			TurnLeftTowards(leftTurnBorder);
 			if (IsAlmostEqual(transform.forward, leftTurnBorder))
 			{
@@ -113,6 +132,18 @@ public class NormalGuard : EnemySenses
 	{
 		return idleBehavior == IdleBehavior.Turn;
 	}
+
+
+	void MoveOnPath()
+	{
+		MoveTowards(waypoints[targetWaypoint]);
+		if(IsAbove( transform.position, waypoints[targetWaypoint]))
+		{
+			targetWaypoint = (targetWaypoint + 1) % waypoints.Length;
+		}
+	}
+
+	#endregion
 
 	void DetectedFrank()
 	{
@@ -133,10 +164,6 @@ public class NormalGuard : EnemySenses
 		}
 	}
 
-	#endregion
-
-	#region Detect external Events
-
 	private void OnControllerColliderHit(ControllerColliderHit hit)
 	{
 		//Stop walking towards the Frank, when touching the Frank
@@ -145,6 +172,26 @@ public class NormalGuard : EnemySenses
 			currentBehavior = Behavior.BringingFrankToCheckpoint;
 		}
 	}
-
 	#endregion
+
+	private void OnDrawGizmos()
+	{
+		//Draw Path, if Idle Behavior = MoveOnPath
+		if(idleBehavior == IdleBehavior.MoveOnPath)
+		{
+			Gizmos.color = Color.green;
+			Vector3 startPosition = pathHolder.GetChild(0).position;
+			Vector3 previosPosition = startPosition;
+			foreach (Transform waypoint in pathHolder)
+			{
+				Gizmos.DrawSphere(waypoint.position, .2f);
+				Gizmos.DrawLine(previosPosition, waypoint.position);
+				previosPosition = waypoint.position;
+			}
+			Gizmos.DrawLine(previosPosition, startPosition);
+		}
+		
+
+		
+	}
 }

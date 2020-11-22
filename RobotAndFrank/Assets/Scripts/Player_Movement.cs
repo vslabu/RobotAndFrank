@@ -18,16 +18,11 @@ public class Player_Movement : MonoBehaviour
 		controller = GetComponentInParent<CharacterController>();
 	}
 
-	// Update is called once per frame
-	void Update()
-    {
+	private void Update()
+	{
 		movement_direction.x = Input.GetAxis("Horizontal");
 		movement_direction.z = Input.GetAxis("Vertical");
-    }
-
-	private void FixedUpdate()
-	{
-		if(movement_direction.magnitude >= 0.1f)
+		if (movement_direction.magnitude >= 0.1f)
 		{
 			//Turn Player in the direction he's walking
 			float targetAngle = Mathf.Atan2(movement_direction.x, movement_direction.z) * Mathf.Rad2Deg;
@@ -35,7 +30,7 @@ public class Player_Movement : MonoBehaviour
 			transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
 			//Move Player
-			controller.Move(movement_direction * movementSpeed * Time.fixedDeltaTime);
+			controller.SimpleMove(movement_direction * movementSpeed);
 		}
 		
 	}
