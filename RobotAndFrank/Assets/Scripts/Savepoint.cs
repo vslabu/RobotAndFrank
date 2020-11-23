@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Savepoint : MonoBehaviour
 {
-	public static Savepoint lastSavepoint;
+	public static Savepoint lastCheckpoint;
 	public bool isStart;
 
 	private void Start()
 	{
-		if(isStart && lastSavepoint == null)
+		if(isStart && lastCheckpoint == null)
 		{
-			lastSavepoint = this;
+			lastCheckpoint = this;
 		}
 	}
 
@@ -19,7 +19,7 @@ public class Savepoint : MonoBehaviour
 	{
 		if(other.tag == "Player")
 		{
-			lastSavepoint = this;
+			lastCheckpoint = this;
 		}
 		
 	}

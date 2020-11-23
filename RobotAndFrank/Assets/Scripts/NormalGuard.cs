@@ -170,7 +170,7 @@ public class NormalGuard : EnemySenses
 		if(!agent.hasPath)
 		{
 			//Set destination
-			Transform lastCheckpoint = Savepoint.lastSavepoint.transform;
+			Transform lastCheckpoint = Savepoint.lastCheckpoint.transform;
 			if(lastCheckpoint != null)
 			{
 				agent.SetDestination(lastCheckpoint.position);

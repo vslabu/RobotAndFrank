@@ -6,6 +6,9 @@ public abstract class NPC_Controller : MonoBehaviour
 {
 	protected CharacterController characterController;
 
+	//The current behavior coroutine
+	protected Coroutine currentBehaviorCoroutine;
+
 	[Header("Movement Variables")]
 	[SerializeField]
 	protected float movementSpeed = 0.1f;
@@ -21,16 +24,39 @@ public abstract class NPC_Controller : MonoBehaviour
 		characterController = GetComponent<CharacterController>();
 	}
 
+	#region coroutines
+	//Stops the old behavior coroutine and starts the new one
+	protected void ChangeCurrentCoroutine(IEnumerator coroutine)
+	{
+		if(currentBehaviorCoroutine != null)
+		{
+			StopCoroutine(currentBehaviorCoroutine);
+		}
+
+		currentBehaviorCoroutine = StartCoroutine(coroutine);
+	}
+
+	//Stops current coroutine
+	protected void StopCurrentCoroutine()
+	{
+		if (currentBehaviorCoroutine != null)
+		{
+			StopCoroutine(currentBehaviorCoroutine);
+		}
+	}
+	#endregion
+
 	protected void MoveTowards(Vector3 target) //Moves NPC toward target
     {
 		Vector3 offset = target - transform.position;
 
-		TurnTowardsSmooth(offset);
+		offset.y = 0;
 
 		offset = offset.normalized * movementSpeed;
 		characterController.SimpleMove(offset);
 	}
 
+	#region Turning
 	protected void TurnTowardsSmooth(Vector3 lookAt)//Turns NPC towards target
 	{
 		float targetAngle = Mathf.Atan2(lookAt.x, lookAt.z) * Mathf.Rad2Deg;
@@ -54,6 +80,9 @@ public abstract class NPC_Controller : MonoBehaviour
 		transform.Rotate(Vector3.up, rotation);
 	}
 
+	#endregion
+
+	#region booleans
 	//Checks if there is a wall between the NPC and the position and if they are not to far appart.
 	//layerMask is the Mask, with all the walls the NPC cant see through
 	protected bool CanSeePosition(Vector3 pos, float sightDistance, LayerMask layerMask)
@@ -97,6 +126,13 @@ public abstract class NPC_Controller : MonoBehaviour
 	{
 		v1.y = 0;
 		v2.y = 0;
-		return IsAlmostEqual(v1, v2);
+		return IsAlmostEqual(v1, v2, 0.1f);
 	}
+
+	protected bool LooksAt(Vector3 pos)
+	{
+		Vector3 lookingDirection = (pos - transform.position).normalized;
+		return IsAbove(lookingDirection, transform.forward);
+	}
+	#endregion
 }

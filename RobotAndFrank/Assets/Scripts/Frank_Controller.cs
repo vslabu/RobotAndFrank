@@ -1,16 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Frank_Controller : NPC_Controller
 {
 	enum Behavior
 	{
-		Stand,
+		Idle,
 		Walk,
 		Detected
 	};
 
-	Behavior currentBehavior = Behavior.Stand;
-	Vector3 currentDestination;
+	Behavior currentBehavior = Behavior.Idle;
 
 	[Header("Hearing Variables")]
 	[SerializeField]
@@ -27,32 +27,42 @@ public class Frank_Controller : NPC_Controller
 		GameEvents.current.OnLongBeep += OnLongBeep;
 	}
 
-
-	void Update()
+	#region Behaviors
+	IEnumerator Idle()
 	{
-		switch (currentBehavior)
-		{
-			case Behavior.Walk:
-				WalkBehavior();
-				return;
-		}	
+		currentBehavior = Behavior.Idle;
+
+		//TODO: Implement idle behavior
+		yield return null;
 	}
 
-	#region Behaviors
-
-	void WalkBehavior()
+	IEnumerator Walk(Vector3 destination)
 	{
-		//Check if Frank reached the destination
-		float distanceToCurrentDestination = Vector3.Distance(currentDestination, transform.position);
-		if (distanceToCurrentDestination > epsilon)
+		currentBehavior = Behavior.Walk;
+
+		//Turn towards Destination
+		Vector3 offset = destination - transform.position;
+		while (!LooksAt(destination))
 		{
-			//Did not yet reach it
-			MoveTowards(currentDestination);
-		} else
-		{
-			//Reached the destination and changes to mode Stand
-			currentBehavior = Behavior.Stand;
+			TurnTowardsSmooth(offset);
+			yield return null;
 		}
+
+		while(!IsAbove(destination, transform.position))
+		{
+			MoveTowards(destination);
+			yield return null;
+		}
+
+		ChangeCurrentCoroutine(Idle());
+	}
+
+	IEnumerator Detected()
+	{
+		currentBehavior = Behavior.Detected;
+
+		//TODO: implement behavior when detected
+		yield return null;
 	}
 
 	#endregion
@@ -63,7 +73,7 @@ public class Frank_Controller : NPC_Controller
 		//Check if Frank can hear the sound
 		if (CanHearBeep(beepPos))
 		{
-			currentBehavior = Behavior.Stand;
+			ChangeCurrentCoroutine(Idle());
 		}
 	}
 
@@ -72,22 +82,21 @@ public class Frank_Controller : NPC_Controller
 		//Check if Frank can hear the sound
 		if(CanHearBeep(beepPos))
 		{
-			currentBehavior = Behavior.Walk;
-			currentDestination = beepPos;
+			ChangeCurrentCoroutine(Walk(beepPos));
 		}
 	}
 
 	public void OnDetect()
 	{
-		currentBehavior = Behavior.Detected;
+		ChangeCurrentCoroutine(Detected());
 	}
 
-	private void OnControllerColliderHit(ControllerColliderHit hit)
+	void OnControllerColliderHit(ControllerColliderHit hit)
 	{
 		//Stop walking towards the destination, when touching the player
 		if(hit.gameObject.tag == "Player")
 		{
-			currentBehavior = Behavior.Stand;
+			ChangeCurrentCoroutine(Idle());
 		}
 	}
 
