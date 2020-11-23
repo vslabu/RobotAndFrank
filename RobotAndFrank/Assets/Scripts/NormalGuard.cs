@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class NormalGuard : EnemySenses
 {
-	#region Behavior Enums
+	#region Behavior
 
 	enum Behavior
 	{
 		Idle, //Normal behavior, see enum IdleBehavior
-		Suspicios, //Hears something, checks out the source
+		Suspicious, //Hears something, checks out the source
 		DetectedFrank, //Seeing Frank and going to him
 		BringingFrankToCheckpoint, //Brings Frank back to the last Checkpoint
 		BackToBuisness //Guard goes Back to his normal buisness
@@ -35,6 +33,7 @@ public class NormalGuard : EnemySenses
 	bool turnright = true;
 	[HideInInspector]
 	public Vector3 leftTurnBorder, rightTurnBorder;
+	Vector3 startPosition;
 
 	#endregion
 
@@ -47,6 +46,9 @@ public class NormalGuard : EnemySenses
 	#endregion
 
 	#endregion
+
+
+	NavMeshAgent agent;
 
 	// Start is called before the first frame update
 	void Start()
@@ -66,6 +68,12 @@ public class NormalGuard : EnemySenses
 				waypoints[i] = pathHolder.GetChild(i).position;
 			}
 		}
+
+		//Init startPosition
+		startPosition = transform.position;
+
+		//Init NavMeshAgent
+		agent = GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
@@ -84,6 +92,12 @@ public class NormalGuard : EnemySenses
 				return;
 			case Behavior.DetectedFrank:
 				DetectedFrank();
+				return;
+			case Behavior.BringingFrankToCheckpoint:
+				BringFrankToCheckpoint();
+				return;
+			case Behavior.BackToBuisness:
+				BackToBuisness();
 				return;
 		}
 	}
@@ -148,6 +162,46 @@ public class NormalGuard : EnemySenses
 	void DetectedFrank()
 	{
 		MoveTowards(frank.transform.position);
+	}
+
+	void BringFrankToCheckpoint()
+	{
+		//check if guard does already have a destination
+		if(!agent.hasPath)
+		{
+			//Set destination
+			Transform lastCheckpoint = Savepoint.lastSavepoint.transform;
+			if(lastCheckpoint != null)
+			{
+				agent.SetDestination(lastCheckpoint.position);
+				Debug.Log("Start");
+			}
+		}
+
+		//check if guard reached the checkpoint
+		float dist = agent.remainingDistance;
+		if (agent.hasPath && dist == 0)
+		{
+			//currentBehavior = Behavior.BackToBuisness;
+			Debug.Log("Ziel");
+		}
+	}
+
+	void BackToBuisness()
+	{
+		//check if guard reached his start position
+		if (agent.pathStatus == NavMeshPathStatus.PathComplete)
+		{
+			currentBehavior = Behavior.Idle;
+		}
+
+		//check if guard does already have a destination
+		if (agent.pathStatus != NavMeshPathStatus.PathPartial)
+		{
+			//Set destination
+			agent.SetDestination(startPosition);
+			Debug.Log("Test");
+		}
 	}
 
 	#endregion
