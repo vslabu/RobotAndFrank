@@ -11,7 +11,7 @@ public abstract class EnemySenses : NPC_Controller
 	[Range(0,360)]
 	public float viewAngle;
 	[SerializeField]
-	protected LayerMask obstacleMask;
+	protected LayerMask visionObstacleMask;
 
 
 	protected void InitSenses()
@@ -23,7 +23,7 @@ public abstract class EnemySenses : NPC_Controller
 
 	protected bool CanSeeFrank()
 	{
-		if(!CanSeePosition(frank.transform.position, viewRadius, obstacleMask)){
+		if(!CanSeePosition(frank.transform.position, viewRadius, visionObstacleMask)){
 			//Frank is either too far away or hidden by an obstacle
 			return false;
 		}

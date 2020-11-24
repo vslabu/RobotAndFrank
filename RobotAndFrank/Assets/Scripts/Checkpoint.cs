@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Savepoint : MonoBehaviour
+public class Checkpoint : MonoBehaviour
 {
-	public static Savepoint lastCheckpoint;
+	public static Checkpoint lastCheckpoint;
 	public bool isStart;
 
 	private void Start()

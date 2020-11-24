@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public abstract class NPC_Controller : MonoBehaviour
 {
 	protected CharacterController characterController;
+	protected GameObject player;
 
 	//The current behavior coroutine
 	protected Coroutine currentBehaviorCoroutine;
@@ -18,10 +20,23 @@ public abstract class NPC_Controller : MonoBehaviour
 	protected float epsilon = 0.01f;
 	[SerializeField]
 	protected float turningSpeed = 10f;
+	[SerializeField]
+	[Tooltip("The Distance, that determines wether NPC is touching another object.")]
+	protected float touchingDistance = 1f;
+
+	[Header("Hearing Variables")]
+	[SerializeField]
+	protected float hearingRadius = 20f;
+	[SerializeField]
+	public LayerMask hearingObstacleMask;
 
 	protected void InitNPCMovement()
 	{
+		//Init Controller
 		characterController = GetComponent<CharacterController>();
+
+		//Init Player
+		player = GameObject.FindGameObjectWithTag("Player");
 	}
 
 	#region coroutines
@@ -48,17 +63,37 @@ public abstract class NPC_Controller : MonoBehaviour
 
 	protected void MoveTowards(Vector3 target) //Moves NPC toward target
     {
-		Vector3 offset = target - transform.position;
+		if(Vector3.Distance(target, transform.position) > movementSpeed * Time.deltaTime)
+		{
+			//target is not near
+			Vector3 offset = target - transform.position;
 
-		offset.y = 0;
+			offset = offset.normalized * movementSpeed;
+			characterController.SimpleMove(offset);
+		} else
+		{
+			//target is near
+			transform.position = target;
+		}
 
-		offset = offset.normalized * movementSpeed;
-		characterController.SimpleMove(offset);
+		
 	}
 
 	#region Turning
 	protected void TurnTowardsSmooth(Vector3 lookAt)//Turns NPC towards target
 	{
+		float targetAngle = Mathf.Atan2(lookAt.x, lookAt.z) * Mathf.Rad2Deg;
+		float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turningTime);
+		transform.rotation = Quaternion.Euler(0f, angle, 0f);
+	}
+
+	protected void TurnTowardsSmooth(Vector3 lookAt, bool worldPosition)//Turns NPC towards target, true means that the position is given in world coordinates
+	{
+		if (worldPosition)
+		{
+			lookAt -= transform.position;
+		}
+
 		float targetAngle = Mathf.Atan2(lookAt.x, lookAt.z) * Mathf.Rad2Deg;
 		float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turningTime);
 		transform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -129,10 +164,38 @@ public abstract class NPC_Controller : MonoBehaviour
 		return IsAlmostEqual(v1, v2, 0.1f);
 	}
 
-	protected bool LooksAt(Vector3 pos)
+	//returns true, when two points have almost equal positions on the plane 
+	protected bool IsAbove(Vector3 v1, Vector3 v2, float e)
+	{
+		v1.y = 0;
+		v2.y = 0;
+		return IsAlmostEqual(v1, v2, e);
+	}
+
+	protected bool LookingAt(Vector3 pos)
 	{
 		Vector3 lookingDirection = (pos - transform.position).normalized;
-		return IsAbove(lookingDirection, transform.forward);
+		return IsAbove(lookingDirection, transform.forward, 0.01f);
+	}
+
+	protected bool IsTouching(GameObject obj)
+	{
+		return Vector3.Distance(obj.transform.position, transform.position) < touchingDistance;
 	}
 	#endregion
+
+	protected float GetPathLength(NavMeshPath path)
+	{
+		float lng = 0.0f;
+
+		if ((path.status != NavMeshPathStatus.PathInvalid) && (path.corners.Length > 1))
+		{
+			for (int i = 1; i < path.corners.Length; ++i)
+			{
+				lng += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+			}
+		}
+
+		return lng;
+	}
 }

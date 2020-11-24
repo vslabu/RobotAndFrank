@@ -12,19 +12,14 @@ public class Frank_Controller : NPC_Controller
 
 	Behavior currentBehavior = Behavior.Idle;
 
-	[Header("Hearing Variables")]
-	[SerializeField]
-	float hearingRadius = 20f;
-	[SerializeField]
-	public LayerMask obstacleMask;
-
-
 	// Start is called before the first frame update
 	void Start()
     {
 		InitNPCMovement();
 		GameEvents.current.OnShortBeep += OnShortBeep;
 		GameEvents.current.OnLongBeep += OnLongBeep;
+
+		ChangeCurrentCoroutine(Idle());
 	}
 
 	#region Behaviors
@@ -41,14 +36,13 @@ public class Frank_Controller : NPC_Controller
 		currentBehavior = Behavior.Walk;
 
 		//Turn towards Destination
-		Vector3 offset = destination - transform.position;
-		while (!LooksAt(destination))
+		while (!LookingAt(destination))
 		{
-			TurnTowardsSmooth(offset);
+			TurnTowardsSmooth(destination, true);
 			yield return null;
 		}
 
-		while(!IsAbove(destination, transform.position))
+		while(!IsAbove(destination, transform.position) && !IsTouching(player))
 		{
 			MoveTowards(destination);
 			yield return null;
@@ -71,7 +65,7 @@ public class Frank_Controller : NPC_Controller
 	void OnShortBeep(Vector3 beepPos)
 	{
 		//Check if Frank can hear the sound
-		if (CanHearBeep(beepPos))
+		if (CanHearBeep(beepPos) && currentBehavior != Behavior.Detected)
 		{
 			ChangeCurrentCoroutine(Idle());
 		}
@@ -80,7 +74,7 @@ public class Frank_Controller : NPC_Controller
 	void OnLongBeep(Vector3 beepPos)
 	{
 		//Check if Frank can hear the sound
-		if(CanHearBeep(beepPos))
+		if(CanHearBeep(beepPos) && currentBehavior != Behavior.Detected)
 		{
 			ChangeCurrentCoroutine(Walk(beepPos));
 		}
@@ -91,20 +85,11 @@ public class Frank_Controller : NPC_Controller
 		ChangeCurrentCoroutine(Detected());
 	}
 
-	void OnControllerColliderHit(ControllerColliderHit hit)
-	{
-		//Stop walking towards the destination, when touching the player
-		if(hit.gameObject.tag == "Player")
-		{
-			ChangeCurrentCoroutine(Idle());
-		}
-	}
-
 	#endregion
 
 	private bool CanHearBeep(Vector3 beepPos)
 	{
-		return CanSeePosition(beepPos, hearingRadius, obstacleMask);
+		return CanSeePosition(beepPos, hearingRadius, hearingObstacleMask);
 	}
 
 	public bool IsDetected()
