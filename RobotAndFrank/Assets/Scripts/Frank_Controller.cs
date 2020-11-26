@@ -42,7 +42,7 @@ public class Frank_Controller : NPC_Controller
 			yield return null;
 		}
 
-		while(!IsAbove(destination, transform.position) && !IsTouching(player))
+		while(!IsAbove(destination, transform.position) && !IsNear(player))
 		{
 			MoveTowards(destination);
 			yield return null;

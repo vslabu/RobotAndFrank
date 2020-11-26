@@ -24,7 +24,7 @@ public class NewBehaviourScript : Editor
 		#endregion
 
 		#region Draw turn angle if needed
-		if (fov is NormalGuard guard && guard.HasTurnBehavior())
+		if (fov.HasTurnBehavior())
 		{
 			Handles.color = Color.green;
 
@@ -33,24 +33,24 @@ public class NewBehaviourScript : Editor
 			if (!Application.isPlaying)
 			{
 				//Used in Editor
-				turnAngleA = guard.transform.forward;
-				turnAngleB = guard.DirFromAngle(guard.turnAngle, false);
+				turnAngleA = fov.transform.forward;
+				turnAngleB = fov.DirFromAngle(fov.turnAngle, false);
 			}
 			else
 			{
-				turnAngleA = guard.leftTurnBorder;
-				turnAngleB = guard.rightTurnBorder;
+				turnAngleA = fov.leftTurnBorder;
+				turnAngleB = fov.rightTurnBorder;
 			}
 
-			Handles.DrawLine(guard.transform.position, guard.transform.position + turnAngleA * guard.viewRadius / 2);
-			Handles.DrawLine(guard.transform.position, guard.transform.position + turnAngleB * guard.viewRadius / 2);
+			Handles.DrawLine(fov.transform.position, fov.transform.position + turnAngleA * fov.viewRadius / 2);
+			Handles.DrawLine(fov.transform.position, fov.transform.position + turnAngleB * fov.viewRadius / 2);
 
 			//Draw circle
-			Handles.DrawWireArc(guard.transform.position, Vector3.up, turnAngleA, guard.turnAngle, guard.viewRadius / 2);
+			Handles.DrawWireArc(fov.transform.position, Vector3.up, turnAngleA, fov.turnAngle, fov.viewRadius / 2);
 
 			//Draw Guards forward direction
 			Handles.color = Color.red;
-			Handles.DrawLine(guard.transform.position, guard.transform.position + guard.transform.forward * guard.viewRadius / 2);
+			Handles.DrawLine(fov.transform.position, fov.transform.position + fov.transform.forward * fov.viewRadius / 2);
 		}
 		#endregion
 	}

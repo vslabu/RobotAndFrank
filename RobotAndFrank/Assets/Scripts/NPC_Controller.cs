@@ -8,8 +8,11 @@ public abstract class NPC_Controller : MonoBehaviour
 	protected CharacterController characterController;
 	protected GameObject player;
 
-	//The current behavior coroutine
-	protected Coroutine currentBehaviorCoroutine;
+	//The current behavior coroutines
+	protected Coroutine currentBehaviorCoroutine; //Main behavior like 'Idle' or 'Alarmed'
+	protected Coroutine subCurrentBehaviorCoroutine; //Sub behavior in the current bahavior coroutine like walking towards a position
+
+	protected NavMeshAgent agent;
 
 	[Header("Movement Variables")]
 	[SerializeField]
@@ -17,7 +20,7 @@ public abstract class NPC_Controller : MonoBehaviour
 	[SerializeField]
 	protected float turningTime = 1f;
 	float turnSmoothVelocity;
-	protected float epsilon = 0.01f;
+	protected const float epsilon = 0.01f;
 	[SerializeField]
 	protected float turningSpeed = 10f;
 	[SerializeField]
@@ -37,26 +40,99 @@ public abstract class NPC_Controller : MonoBehaviour
 
 		//Init Player
 		player = GameObject.FindGameObjectWithTag("Player");
+
+		//Init NavMeshAgent if possible
+		agent = GetComponent<NavMeshAgent>();
+		if(agent != null)
+		{
+			agent.enabled = false;
+		}
+		
 	}
 
 	#region coroutines
 	//Stops the old behavior coroutine and starts the new one
 	protected void ChangeCurrentCoroutine(IEnumerator coroutine)
 	{
-		if(currentBehaviorCoroutine != null)
-		{
-			StopCoroutine(currentBehaviorCoroutine);
-		}
+		StopCurrentCoroutine();
 
 		currentBehaviorCoroutine = StartCoroutine(coroutine);
+	}
+
+	//Stops the old behavior coroutine and starts the new one
+	protected Coroutine SubChangeCurrentCoroutine(IEnumerator subcoroutine)
+	{
+		SubStopCurrentCoroutine();
+
+		return subCurrentBehaviorCoroutine = StartCoroutine(subcoroutine);
 	}
 
 	//Stops current coroutine
 	protected void StopCurrentCoroutine()
 	{
+		//Stop current SubCoroutine
+		SubStopCurrentCoroutine();
+
+		//Stop current Coroutine
 		if (currentBehaviorCoroutine != null)
 		{
 			StopCoroutine(currentBehaviorCoroutine);
+		}
+	}
+
+	protected void SubStopCurrentCoroutine()
+	{
+		//Stop current SubCoroutine
+		if (subCurrentBehaviorCoroutine != null)
+		{
+			StopCoroutine(subCurrentBehaviorCoroutine);
+		}
+
+		if (agent != null)
+		{
+			agent.enabled = false;
+		}
+	}
+	#endregion
+
+	#region Basic SubCoroutine Behaviors
+	protected IEnumerator TurnTowardsCoroutine(Vector3 pos)
+	{
+		while (!LookingAt(pos))
+		{
+			TurnTowardsSmooth(pos, true);
+			yield return null;
+		}
+	}
+
+	protected IEnumerator MoveToObjectCoroutine(GameObject obj)
+	{
+		while (!IsNear(obj))
+		{
+			MoveTowards(obj.transform.position);
+			yield return null;
+		}
+	}
+
+	protected IEnumerator PathfindTowards(Vector3 pos)
+	{
+		if(agent == null)
+		{
+			Debug.LogError("No NavMeshAgent found");
+			SubStopCurrentCoroutine();
+		}
+
+		agent.enabled = true;
+
+		if (!agent.SetDestination(pos))
+		{
+			Debug.LogError("No way to the last checkpoint was found!");
+		}
+
+		//wait for reaching the destination
+		while (!IsAbove(pos, transform.position))
+		{
+			yield return null;
 		}
 	}
 	#endregion
@@ -74,9 +150,7 @@ public abstract class NPC_Controller : MonoBehaviour
 		{
 			//target is near
 			transform.position = target;
-		}
-
-		
+		}	
 	}
 
 	#region Turning
@@ -178,7 +252,7 @@ public abstract class NPC_Controller : MonoBehaviour
 		return IsAbove(lookingDirection, transform.forward, 0.01f);
 	}
 
-	protected bool IsTouching(GameObject obj)
+	protected bool IsNear(GameObject obj)
 	{
 		return Vector3.Distance(obj.transform.position, transform.position) < touchingDistance;
 	}

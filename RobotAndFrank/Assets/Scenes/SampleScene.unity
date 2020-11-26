@@ -106,7 +106,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 1.5
+    agentRadius: 1
     agentHeight: 2
     agentSlope: 45
     agentClimb: 0.76
@@ -114,7 +114,7 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.5
+    cellSize: 0.33333334
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -257,6 +257,7 @@ GameObject:
   - component: {fileID: 88070034}
   - component: {fileID: 88070036}
   - component: {fileID: 88070033}
+  - component: {fileID: 88070037}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -309,7 +310,7 @@ Transform:
   m_Children:
   - {fileID: 128392373}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &88070036
 MonoBehaviour:
@@ -323,6 +324,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23a3d34c3a6fae140a8d5a0b50519e84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!208 &88070037
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88070032}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 1, y: 1, z: 1}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &101669583
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,6 +351,7 @@ GameObject:
   - component: {fileID: 101669585}
   - component: {fileID: 101669584}
   - component: {fileID: 101669586}
+  - component: {fileID: 101669587}
   m_Layer: 0
   m_Name: Frank
   m_TagString: Frank
@@ -374,7 +392,7 @@ Transform:
   m_Children:
   - {fileID: 1794304837}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &101669586
 CharacterController:
@@ -394,6 +412,22 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!208 &101669587
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101669583}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 1, y: 1, z: 1}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &128392372
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,7 +1002,7 @@ Transform:
   - {fileID: 2115807564}
   - {fileID: 1952608567}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &773060204
 GameObject:
@@ -1011,7 +1045,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &800177987
 GameObject:
@@ -1042,36 +1076,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 756512793}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &807834531
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 807834532}
-  m_Layer: 0
-  m_Name: NavMesh
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &807834532
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 807834531}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &839154466
 GameObject:
@@ -1643,7 +1647,7 @@ MonoBehaviour:
   visionObstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  idleBehavior: 2
+  idleBehavior: 1
   turnAngle: 82
   leftTurnBorder: {x: 0, y: 0, z: 0}
   rightTurnBorder: {x: 0, y: 0, z: 0}
@@ -1681,7 +1685,7 @@ Transform:
   m_Children:
   - {fileID: 676260504}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &1298035376
 NavMeshAgent:
@@ -1692,7 +1696,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1298035372}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1.5
+  m_Radius: 0.5
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -1704,7 +1708,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 1
 --- !u!1 &1406030860
 GameObject:
   m_ObjectHideFlags: 0
@@ -1903,7 +1907,7 @@ Transform:
   - {fileID: 1523960798}
   - {fileID: 1477962241}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1523960797
 GameObject:
