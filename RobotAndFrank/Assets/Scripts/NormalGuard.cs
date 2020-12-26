@@ -67,10 +67,15 @@ public class NormalGuard : EnemySenses
 
 		yield return new WaitForSeconds(0.3f);
 
+		//Tell Frank he has to follow
+		frank.OnStartEscorting(this);
+
 		//Move towards last checkpoint
 		Vector3 lastCheckpoint = Checkpoint.lastCheckpoint.transform.position;
 		yield return SubChangeCurrentCoroutine(PathfindTowards(lastCheckpoint));
 
+		//Tell Frank he can stop following
+		frank.OnFinishedEscorting();
 		yield return new WaitForSeconds(1f);
 
 		//Move back to normal position
@@ -108,7 +113,6 @@ public class NormalGuard : EnemySenses
 		if(!frank.IsDetected())
 		{
 			currentBehavior = Behavior.DetectedFrank;
-			frank.OnDetect();
 		}
 	}
 

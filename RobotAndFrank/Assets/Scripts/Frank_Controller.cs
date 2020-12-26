@@ -42,7 +42,8 @@ public class Frank_Controller : NPC_Controller
 			yield return null;
 		}
 
-		while(!IsAbove(destination, transform.position) && !IsNear(player))
+		//Move towards Destination
+		while (!IsAbove(destination, transform.position) && !IsNear(player))
 		{
 			MoveTowards(destination);
 			yield return null;
@@ -55,8 +56,15 @@ public class Frank_Controller : NPC_Controller
 	{
 		currentBehavior = Behavior.Detected;
 
-		//TODO: implement behavior when detected
+		//TODO: Implement Detected Behavior
 		yield return null;
+	}
+
+	IEnumerator EscortToCheckpoint(EnemySenses guard)
+	{
+		currentBehavior = Behavior.Detected;
+
+		yield return SubChangeCurrentCoroutine(FollowObjectCoroutine(guard.gameObject));
 	}
 
 	#endregion
@@ -84,6 +92,17 @@ public class Frank_Controller : NPC_Controller
 	{
 		ChangeCurrentCoroutine(Detected());
 	}
+
+	public void OnStartEscorting(EnemySenses guard)
+	{
+		ChangeCurrentCoroutine(EscortToCheckpoint(guard));
+	}
+
+	public void OnFinishedEscorting()
+	{
+		ChangeCurrentCoroutine(Idle());
+	}
+
 
 	#endregion
 

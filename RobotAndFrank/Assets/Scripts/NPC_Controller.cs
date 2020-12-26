@@ -20,7 +20,7 @@ public abstract class NPC_Controller : MonoBehaviour
 	[SerializeField]
 	protected float turningTime = 1f;
 	float turnSmoothVelocity;
-	protected const float epsilon = 0.01f;
+	protected const float epsilon = 0.02f;
 	[SerializeField]
 	protected float turningSpeed = 10f;
 	[SerializeField]
@@ -110,6 +110,19 @@ public abstract class NPC_Controller : MonoBehaviour
 		while (!IsNear(obj))
 		{
 			MoveTowards(obj.transform.position);
+			yield return null;
+		}
+	}
+
+	protected IEnumerator FollowObjectCoroutine(GameObject obj)
+	{
+		while (true)
+		{
+			if(Vector3.Distance(obj.transform.position, transform.position) > 2.5f)
+			{
+				TurnTowardsSmooth(obj.transform.position, true);
+				MoveTowards(obj.transform.position);
+			}
 			yield return null;
 		}
 	}
@@ -248,8 +261,9 @@ public abstract class NPC_Controller : MonoBehaviour
 
 	protected bool LookingAt(Vector3 pos)
 	{
-		Vector3 lookingDirection = (pos - transform.position).normalized;
-		return IsAbove(lookingDirection, transform.forward, 0.01f);
+		Vector3 lookingDirection = pos - transform.position;
+		lookingDirection.y = 0;
+		return IsAbove(lookingDirection.normalized, transform.forward, 0.01f);
 	}
 
 	protected bool IsNear(GameObject obj)
