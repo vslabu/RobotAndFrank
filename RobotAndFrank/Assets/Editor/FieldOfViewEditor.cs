@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor (typeof(EnemySenses), true)]
-public class NewBehaviourScript : Editor
+public class FieldOfViewEditor : Editor
 {
 	private void OnSceneGUI()
 	{
